@@ -139,10 +139,9 @@ class SistemManajemenTamu:
         self.update_treeview()
         messagebox.showinfo("Sukses", "Tamu berhasil diurutkan!")
 
+#Dikerjakan Oleh Rizky Firmansyah 
 
-#Dikerjakan oleh Rizky Firmansyah 
-
-def cari_tamu(self):
+    def cari_tamu(self):
         search_window = Toplevel(self.root)
         search_window.title("Cari Tamu")
         Label(search_window, text="Cari berdasarkan:", font=("Helvetica", 12), background="#FFFDD0").pack(pady=10)
