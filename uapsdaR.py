@@ -63,3 +63,75 @@ class SistemManajemenTamu:
         self.tree_scroll = ttk.Scrollbar(self.tree_frame, orient=VERTICAL, command=self.tree.yview)
         self.tree_scroll.pack(side=RIGHT, fill=Y)
         self.tree.configure(yscrollcommand=self.tree_scroll.set)
+
+#Dikerjakan oleh Maura Hellena    
+    
+    def tambah_tamu(self):
+        self.edit_tamu_window("Tambah Tamu", self.simpan_tamu_baru)
+
+    def simpan_tamu_baru(self, id, nama, waktu_kedatangan, status_undangan, kategori):
+        tamu = Tamu(id, nama, waktu_kedatangan, status_undangan, kategori)
+        self.tamu.append(tamu)
+        self.update_treeview()
+        messagebox.showinfo("Sukses", "Tamu berhasil ditambahkan!")
+
+    def lihat_tamu(self):
+        self.update_treeview()
+
+    def perbarui_tamu(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Peringatan", "Silakan pilih tamu yang ingin diperbarui.")
+            return
+
+        item = self.tree.item(selected_item)
+        tamu_data = item['values']
+        self.edit_tamu_window("Perbarui Tamu", self.simpan_tamu_diperbarui, *tamu_data)
+
+    def simpan_tamu_diperbarui(self, id, nama, waktu_kedatangan, status_undangan, kategori):
+        for tamu in self.tamu:
+            if tamu.id == id:
+                tamu.nama = nama
+                tamu.waktu_kedatangan = waktu_kedatangan
+                tamu.status_undangan = status_undangan
+                tamu.kategori = kategori
+                self.update_treeview()
+                messagebox.showinfo("Sukses", "Tamu berhasil diperbarui!")
+                return
+
+    def hapus_tamu(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Peringatan", "Silakan pilih tamu yang ingin dihapus.")
+            return
+
+        item = self.tree.item(selected_item)
+        tamu_id = item['values'][0]
+
+        self.tamu = [tamu for tamu in self.tamu if tamu.id != tamu_id]
+        self.tree.delete(selected_item)
+        messagebox.showinfo("Sukses", "Tamu berhasil dihapus!")
+
+    def urutkan_tamu(self):
+        sort_window = Toplevel(self.root)
+        sort_window.title("Urutkan Tamu")
+        Label(sort_window, text="Urutkan berdasarkan:", font=("Helvetica", 12), background="#FFFDD0").pack(pady=10)
+        criteria = StringVar()
+        criteria.set("nama")
+        OptionMenu(sort_window, criteria, "nama", "waktu_kedatangan", "status_undangan", "kategori").pack(pady=10)
+        Button(sort_window, text="Urutkan", command=lambda: self.lakukan_pengurutan(criteria.get())).pack(pady=10)
+
+    def lakukan_pengurutan(self, criteria):
+        if criteria == "nama":
+            self.tamu.sort(key=lambda tamu: tamu.nama)
+        elif criteria == "waktu_kedatangan":
+            self.tamu.sort(key=lambda tamu: tamu.waktu_kedatangan)
+        elif criteria == "status_undangan":
+            self.tamu.sort(key=lambda tamu: tamu.status_undangan)
+        elif criteria == "kategori":
+            self.tamu.sort(key=lambda tamu: tamu.kategori)
+        else:
+            messagebox.showerror("Kesalahan", "Kriteria tidak valid")
+            return
+        self.update_treeview()
+        messagebox.showinfo("Sukses", "Tamu berhasil diurutkan!")
