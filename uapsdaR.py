@@ -138,3 +138,86 @@ class SistemManajemenTamu:
             return
         self.update_treeview()
         messagebox.showinfo("Sukses", "Tamu berhasil diurutkan!")
+
+
+#Dikerjakan oleh Rizky Firmansyah 
+
+def cari_tamu(self):
+        search_window = Toplevel(self.root)
+        search_window.title("Cari Tamu")
+        Label(search_window, text="Cari berdasarkan:", font=("Helvetica", 12), background="#FFFDD0").pack(pady=10)
+        criteria = StringVar()
+        criteria.set("nama")
+        OptionMenu(search_window, criteria, "nama", "kategori").pack(pady=10)
+        keyword_entry = Entry(search_window, font=("Helvetica", 12))
+        keyword_entry.pack(pady=10)
+        Button(search_window, text="Cari", command=lambda: self.lakukan_pencarian(criteria.get(), keyword_entry.get())).pack(pady=10)
+
+    def lakukan_pencarian(self, criteria, keyword):
+        tamu_ditemukan = []
+        if criteria == "nama":
+            tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.nama.lower()]
+        elif criteria == "kategori":
+            tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.kategori.lower()]
+        else:
+            messagebox.showerror("Kesalahan", "Kriteria tidak valid")
+            return
+        self.update_treeview(tamu_ditemukan)
+
+    def impor_tamu(self):
+        file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+        if file_path:
+            with open(file_path, 'r') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)  # Skip header
+                for row in csv_reader:
+                    self.tamu.append(Tamu(*row))
+            self.update_treeview()
+            messagebox.showinfo("Sukses", "Tamu berhasil diimpor dari file CSV!")
+
+    def ekspor_tamu(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+        if file_path:
+            with open(file_path, 'w', newline='') as file:
+                csv_writer = csv.writer(file)
+                csv_writer.writerow(["ID", "Nama", "Waktu Kedatangan", "Status Undangan", "Kategori"])
+                for tamu in self.tamu:
+                    csv_writer.writerow([tamu.id, tamu.nama, tamu.waktu_kedatangan, tamu.status_undangan, tamu.kategori])
+            messagebox.showinfo("Sukses", "Tamu berhasil diekspor ke file CSV!")
+
+    def edit_tamu_window(self, title, command, id="", nama="", waktu_kedatangan="", status_undangan="", kategori=""):
+        edit_window = Toplevel(self.root)
+        edit_window.title(title)
+        edit_window.configure(background="#FFFDD0")  # Changed to a valid color code
+        Label(edit_window, text="ID:", font=("Helvetica", 12), background="#FFFDD0").grid(row=0, column=0, pady=5)
+        id_entry = Entry(edit_window, font=("Helvetica", 12))
+        id_entry.insert(END, id)
+        id_entry.grid(row=0, column=1, pady=5)
+        Label(edit_window, text="Nama:", font=("Helvetica", 12), background="#FFFDD0").grid(row=1, column=0, pady=5)
+        nama_entry = Entry(edit_window, font=("Helvetica", 12))
+        nama_entry.insert(END, nama)
+        nama_entry.grid(row=1, column=1, pady=5)
+        Label(edit_window, text="Waktu Kedatangan:", font=("Helvetica", 12), background="#FFFDD0").grid(row=2, column=0, pady=5)
+        waktu_entry = Entry(edit_window, font=("Helvetica", 12))
+        waktu_entry.insert(END, waktu_kedatangan)
+        waktu_entry.grid(row=2, column=1, pady=5)
+        Label(edit_window, text="Status Undangan:", font=("Helvetica", 12), background="#FFFDD0").grid(row=3, column=0, pady=5)
+        status_entry = Entry(edit_window, font=("Helvetica", 12))
+        status_entry.insert(END, status_undangan)
+        status_entry.grid(row=3, column=1, pady=5)
+        Label(edit_window, text="Kategori:", font=("Helvetica", 12), background="#FFFDD0").grid(row=4, column=0, pady=5)
+        kategori_entry = Entry(edit_window, font=("Helvetica", 12))
+        kategori_entry.insert(END, kategori)
+        kategori_entry.grid(row=4, column=1, pady=5)
+        Button(edit_window, text="Simpan", command=lambda: command(id_entry.get(), nama_entry.get(), waktu_entry.get(), status_entry.get(), kategori_entry.get())).grid(row=5, columnspan=2, pady=10)
+
+    def update_treeview(self, data=None):
+        self.tree.delete(*self.tree.get_children())
+        tamu_list = self.tamu if data is None else data
+        for tamu in tamu_list:
+            self.tree.insert('', 'end', values=(tamu.id, tamu.nama, tamu.waktu_kedatangan, tamu.status_undangan, tamu.kategori))
+
+if __name__ == "__main__":
+    root = Tk()
+    app = SistemManajemenTamu(root)
+    root.mainloop()
