@@ -1,3 +1,6 @@
+#Sistem Manajemen Buku Tamu Pesta
+
+#Dikerjakan Oleh Raihan Andi Saungnaga
 import csv
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
@@ -64,7 +67,7 @@ class SistemManajemenTamu:
         self.tree_scroll.pack(side=RIGHT, fill=Y)
         self.tree.configure(yscrollcommand=self.tree_scroll.set)
 
-#Dikerjakan oleh Maura Hellena    
+#Dikerjakan Oleh Maura Hellena    
     
     def tambah_tamu(self):
         self.edit_tamu_window("Tambah Tamu", self.simpan_tamu_baru)
