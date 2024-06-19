@@ -150,18 +150,25 @@ class SistemManajemenTamu:
     def cari_tamu(self):
         search_window = Toplevel(self.root)
         search_window.title("Cari Tamu")
+        search_window.configure(background="#FFFDD0")
         Label(search_window, text="Cari berdasarkan:", font=("Helvetica", 12), background="#FFFDD0").pack(pady=10)
         criteria = StringVar()
         criteria.set("nama")
-        OptionMenu(search_window, criteria, "nama", "kategori").pack(pady=10)
+        OptionMenu(search_window, criteria, "ID", "nama", "waktu_kedatangan", "status_undangan", "kategori").pack(pady=10)
         keyword_entry = Entry(search_window, font=("Helvetica", 12))
         keyword_entry.pack(pady=10)
         Button(search_window, text="Cari", command=lambda: self.lakukan_pencarian(criteria.get(), keyword_entry.get())).pack(pady=10)
 
     def lakukan_pencarian(self, criteria, keyword):
         tamu_ditemukan = []
-        if criteria == "nama":
+        if criteria == "ID":
+            tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.id.lower()]
+        elif criteria == "nama":
             tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.nama.lower()]
+        elif criteria == "waktu_kedatangan":
+            tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.waktu_kedatangan.lower()]
+        elif criteria == "status_undangan":
+            tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.status_undangan.lower()]
         elif criteria == "kategori":
             tamu_ditemukan = [tamu for tamu in self.tamu if keyword.lower() in tamu.kategori.lower()]
         else:
@@ -172,9 +179,10 @@ class SistemManajemenTamu:
     def impor_tamu(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if file_path:
+            self.tamu = []  
             with open(file_path, 'r') as file:
                 csv_reader = csv.reader(file)
-                next(csv_reader)  # Skip header
+                next(csv_reader)  
                 for row in csv_reader:
                     self.tamu.append(Tamu(*row))
             self.update_treeview()
@@ -193,7 +201,7 @@ class SistemManajemenTamu:
     def edit_tamu_window(self, title, command, id="", nama="", waktu_kedatangan="", status_undangan="", kategori=""):
         edit_window = Toplevel(self.root)
         edit_window.title(title)
-        edit_window.configure(background="#FFFDD0")  # Changed to a valid color code
+        edit_window.configure(background="#FFFDD0")
         Label(edit_window, text="ID:", font=("Helvetica", 12), background="#FFFDD0").grid(row=0, column=0, pady=5)
         id_entry = Entry(edit_window, font=("Helvetica", 12))
         id_entry.insert(END, id)
