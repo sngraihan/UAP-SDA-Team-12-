@@ -67,12 +67,15 @@ class SistemManajemenTamu:
         self.tree_scroll.pack(side=RIGHT, fill=Y)
         self.tree.configure(yscrollcommand=self.tree_scroll.set)
 
-#Dikerjakan Oleh Maura Hellena    
+#Dikerjakan Oleh Maura Hellena 
     
     def tambah_tamu(self):
         self.edit_tamu_window("Tambah Tamu", self.simpan_tamu_baru)
 
     def simpan_tamu_baru(self, id, nama, waktu_kedatangan, status_undangan, kategori):
+        if any(tamu.id == id for tamu in self.tamu):
+            messagebox.showwarning("Peringatan", "ID sudah ada. Gunakan ID yang berbeda.")
+            return
         tamu = Tamu(id, nama, waktu_kedatangan, status_undangan, kategori)
         self.tamu.append(tamu)
         self.update_treeview()
@@ -112,20 +115,23 @@ class SistemManajemenTamu:
         tamu_id = item['values'][0]
 
         self.tamu = [tamu for tamu in self.tamu if tamu.id != tamu_id]
-        self.tree.delete(selected_item)
+        self.tree.delete(selected_item)  
         messagebox.showinfo("Sukses", "Tamu berhasil dihapus!")
 
     def urutkan_tamu(self):
         sort_window = Toplevel(self.root)
         sort_window.title("Urutkan Tamu")
+        sort_window.configure(background="#FFFDD0")
         Label(sort_window, text="Urutkan berdasarkan:", font=("Helvetica", 12), background="#FFFDD0").pack(pady=10)
         criteria = StringVar()
         criteria.set("nama")
-        OptionMenu(sort_window, criteria, "nama", "waktu_kedatangan", "status_undangan", "kategori").pack(pady=10)
+        OptionMenu(sort_window, criteria, "ID", "nama", "waktu_kedatangan", "status_undangan", "kategori").pack(pady=10)
         Button(sort_window, text="Urutkan", command=lambda: self.lakukan_pengurutan(criteria.get())).pack(pady=10)
 
     def lakukan_pengurutan(self, criteria):
-        if criteria == "nama":
+        if criteria == "ID":
+            self.tamu.sort(key=lambda tamu: tamu.id)
+        elif criteria == "nama":
             self.tamu.sort(key=lambda tamu: tamu.nama)
         elif criteria == "waktu_kedatangan":
             self.tamu.sort(key=lambda tamu: tamu.waktu_kedatangan)
@@ -137,7 +143,7 @@ class SistemManajemenTamu:
             messagebox.showerror("Kesalahan", "Kriteria tidak valid")
             return
         self.update_treeview()
-        messagebox.showinfo("Sukses", "Tamu berhasil diurutkan!")
+        messagebox.showinfo("Sukses", "Tamu berhasil diurutkan!")    
 
 #Dikerjakan Oleh Rizky Firmansyah 
 
